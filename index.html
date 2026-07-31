@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <title>工作追蹤中心</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <p class="eyebrow">STUDENT AFFAIRS OFFICE</p>
+            <h1>工作追蹤中心</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="sync-info"><span class="sync-dot"></span><span>最後同步 <b id="lastSync">今天 11:30</b></span></div>
+          <button class="button button-quiet" id="settingsButton"><span>⚙</span> 分類設定</button>
+          <button class="button button-primary" id="syncButton"><span>↻</span> 立即同步</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="welcome-row">
+          <div>
+            <p class="today-label">2026 年 7 月 31 日 · 星期五</p>
+            <h2>早安。今天有 <strong id="todayCount">0</strong> 項工作需要留意。</h2>
+          </div>
+          <button class="new-task" id="newTaskButton"><span>＋</span> 新增追蹤工作</button>
+        </section>
+
+        <section class="control-panel" aria-label="搜尋與篩選">
+          <div class="search-wrap">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="搜尋工作、備註、下一步…" autocomplete="off" />
+          </div>
+          <div class="filter-row">
+            <div class="filter-group category-filter" id="categoryFilters"></div>
+            <div class="filter-divider"></div>
+            <div class="filter-group quick-filter" id="quickFilters">
+              <button class="filter-chip active" data-filter="open">只看未完成</button>
+              <button class="filter-chip" data-filter="today">今天到期</button>
+              <button class="filter-chip warning" data-filter="overdue">已逾期</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="workspace-grid">
+          <section class="task-area" aria-label="工作清單">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">WORK OVERVIEW</p>
+                <h2>依工作主題整理</h2>
+              </div>
+              <span class="count-summary" id="visibleSummary"></span>
+            </div>
+            <div id="taskGroups"></div>
+            <div class="empty-state hidden" id="emptyState">
+              <span>⌕</span>
+              <h3>找不到相符的工作</h3>
+              <p>請調整搜尋文字或篩選條件。</p>
+            </div>
+          </section>
+
+          <aside class="reminder-panel" aria-label="工作提醒">
+            <div class="reminder-heading">
+              <div><p class="eyebrow">FOCUS LIST</p><h2>工作提醒</h2></div>
+              <span class="reminder-icon">✦</span>
+            </div>
+            <div class="reminder-intro">優先處理有明確下一步的工作，讓每件事都有結果。</div>
+            <div id="reminderLists"></div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="taskModalBackdrop">
+      <section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header"><div><p class="eyebrow">WORK DETAIL</p><h2 id="modalTitle">工作詳細資料</h2></div><button class="icon-button close-modal" aria-label="關閉">×</button></div>
+        <form id="taskForm">
+          <input type="hidden" id="taskId" />
+          <label class="field field-full">工作名稱<input id="taskTitle" required maxlength="100" placeholder="輸入工作名稱" /></label>
+          <div class="field-grid">
+            <label class="field">工作分類<select id="taskCategory"></select></label>
+            <label class="field">進度狀況<select id="taskStatus"></select></label>
+            <label class="field">行事曆日期<input id="taskDate" type="date" required /></label>
+            <label class="field">截止日期<input id="taskDueDate" type="date" /></label>
+          </div>
+          <label class="field field-full">下一步<input id="taskNextAction" maxlength="160" placeholder="例如：聯絡資訊組確認資料格式" /></label>
+          <label class="field field-full">備註<textarea id="taskNote" rows="3" maxlength="500" placeholder="補充工作背景、聯繫記錄或待確認事項"></textarea></label>
+          <div class="original-data"><span>Google Calendar 原始資料</span><p id="calendarOrigin">尚未連接 Google Calendar</p></div>
+          <div class="modal-footer"><label class="check-field"><input type="checkbox" id="taskArchived" /> 封存此工作</label><div><button type="button" class="button button-quiet close-modal">取消</button><button type="submit" class="button button-primary">儲存變更</button></div></div>
+        </form>
+      </section>
+    </div>
+
+    <div class="modal-backdrop hidden" id="settingsBackdrop">
+      <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="modal-header"><div><p class="eyebrow">CLASSIFICATION</p><h2 id="settingsTitle">工作分類設定</h2></div><button class="icon-button close-settings" aria-label="關閉">×</button></div>
+        <p class="settings-copy">分類以工作主題為準，不以會議、研習等工作形式分類。</p>
+        <div id="categorySettings" class="category-settings"></div>
+        <form class="add-category" id="categoryForm"><input id="newCategoryInput" maxlength="20" required placeholder="新增工作分類" /><button class="button button-primary">新增</button></form>
+      </section>
+    </div>
+    <div class="toast hidden" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
