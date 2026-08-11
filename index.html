@@ -21,16 +21,28 @@
           </div>
         </div>
         <div class="topbar-actions">
-          <div class="sync-info"><span class="sync-dot"></span><span>最後同步 <b id="lastSync">今天 11:30</b></span></div>
+          <div class="sync-info"><span class="sync-dot"></span><span>最後同步 <b id="lastSync">尚未同步</b></span></div>
           <button class="button button-quiet" id="settingsButton"><span>⚙</span> 分類設定</button>
-          <button class="button button-primary" id="syncButton"><span>↻</span> 立即同步</button>
+          <button class="button button-primary" id="syncButton" disabled><span>↻</span> 立即同步</button>
         </div>
       </header>
+
+      <section class="calendar-banner" aria-label="Google 日曆連線狀態">
+        <div class="calendar-connection-copy">
+          <span class="calendar-status-dot" id="calendarStatusDot"></span>
+          <div><p class="eyebrow">GOOGLE CALENDAR</p><p class="calendar-status" id="calendarStatus">正在載入 Google 登入服務…</p></div>
+        </div>
+        <div class="calendar-connection-actions">
+          <button class="button button-google" id="googleConnectButton" disabled><span class="google-g">G</span> 連結 Google 日曆</button>
+          <button class="button button-quiet hidden" id="changeCalendarButton">切換日曆</button>
+          <button class="link-button hidden" id="googleDisconnectButton">解除連結</button>
+        </div>
+      </section>
 
       <main>
         <section class="welcome-row">
           <div>
-            <p class="today-label">2026 年 7 月 31 日 · 星期五</p>
+            <p class="today-label" id="todayLabel"></p>
             <h2>早安。今天有 <strong id="todayCount">0</strong> 項工作需要留意。</h2>
           </div>
           <button class="new-task" id="newTaskButton"><span>＋</span> 新增追蹤工作</button>
@@ -48,6 +60,9 @@
               <button class="filter-chip active" data-filter="open">只看未完成</button>
               <button class="filter-chip" data-filter="today">今天到期</button>
               <button class="filter-chip warning" data-filter="overdue">已逾期</button>
+              <button class="filter-chip" data-filter="all">全部狀態</button>
+              <button class="filter-chip" data-filter="completed">已完成</button>
+              <button class="filter-chip" data-filter="archived">已封存</button>
             </div>
           </div>
         </section>
@@ -95,7 +110,7 @@
           </div>
           <label class="field field-full">下一步<input id="taskNextAction" maxlength="160" placeholder="例如：聯絡資訊組確認資料格式" /></label>
           <label class="field field-full">備註<textarea id="taskNote" rows="3" maxlength="500" placeholder="補充工作背景、聯繫記錄或待確認事項"></textarea></label>
-          <div class="original-data"><span>Google Calendar 原始資料</span><p id="calendarOrigin">尚未連接 Google Calendar</p></div>
+          <div class="original-data"><span id="calendarOriginLabel">Google Calendar 原始資料</span><p id="calendarOrigin">尚未連接 Google Calendar</p><a class="calendar-link hidden" id="calendarLink" target="_blank" rel="noopener noreferrer">在 Google 日曆中開啟</a></div>
           <div class="modal-footer"><label class="check-field"><input type="checkbox" id="taskArchived" /> 封存此工作</label><div><button type="button" class="button button-quiet close-modal">取消</button><button type="submit" class="button button-primary">儲存變更</button></div></div>
         </form>
       </section>
@@ -107,6 +122,14 @@
         <p class="settings-copy">分類以工作主題為準，不以會議、研習等工作形式分類。</p>
         <div id="categorySettings" class="category-settings"></div>
         <form class="add-category" id="categoryForm"><input id="newCategoryInput" maxlength="20" required placeholder="新增工作分類" /><button class="button button-primary">新增</button></form>
+      </section>
+    </div>
+
+    <div class="modal-backdrop hidden" id="calendarBackdrop">
+      <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="calendarChooserTitle">
+        <div class="modal-header"><div><p class="eyebrow">CALENDAR SOURCE</p><h2 id="calendarChooserTitle">選擇工作日曆</h2></div><button class="icon-button close-calendar" aria-label="關閉">×</button></div>
+        <p class="settings-copy">請選擇要作為工作追蹤主體的 Google 日曆。此網站只會要求唯讀權限。</p>
+        <div class="calendar-options" id="calendarOptions"></div>
       </section>
     </div>
     <div class="toast hidden" id="toast" role="status"></div>
